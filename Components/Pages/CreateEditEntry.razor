@@ -22,8 +22,8 @@
 @* [VIVA INFO]: Uses a 'Dynamic Layout' that changes based on 'IsEditMode'. *@
         <div class="d-flex align-center justify-space-between mb-10">
             <div>
-                <MudText Typo="Typo.h3" Class="fw-extra-bold primary-gradient-text">@(IsEditMode ? "Refine Your Journey" : "Vibrant Writing")</MudText>
-                <MudText Typo="Typo.h6" Class="secondary-text opacity-60">@(IsEditMode ? "Polishing your brilliant thoughts." : "Spark a new memory and let it shine.")</MudText>
+                <MudText Typo="Typo.h3" Class="fw-extra-bold primary-gradient-text">@(IsEditMode ? "Refine your entry" : "New entry")</MudText>
+                <MudText Typo="Typo.h6" Class="secondary-text opacity-60">@(IsEditMode ? "Polish and refine your thoughts." : "Capture a new memory and let it breathe.")</MudText>
             </div>
             <div class="d-flex gap-2">
                 <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="Cancel" Class="rounded-pill px-6">Cancel</MudButton>
@@ -70,7 +70,7 @@
                                 <MudIconButton Icon="@Icons.Material.Filled.InsertEmoticon" OnClick='() => ApplyFormat("emoji")' Size="Size.Small" />
                                 <MudIconButton Icon="@Icons.Material.Filled.Link" OnClick='() => ApplyFormat("link")' Size="Size.Small" />
                                 <MudSpacer />
-                                <MudToggleIconButton @bind-Toggled="showPreview" Icon="@Icons.Material.Filled.Visibility" ToggledIcon="@Icons.Material.Filled.Edit" Size="Size.Small" Title="Preview" ToggledTitle="Edit" />
+                                <MudToggleIconButton @bind-Toggled="showPreview" Icon="@Icons.Material.Filled.Visibility" ToggledIcon="@Icons.Material.Filled.Edit" Size="Size.Small" />
                             </MudToolBar>
                         </div>
 
@@ -100,7 +100,7 @@
                                     {
                                         <MudText Typo="Typo.caption" Class="@autoSaveStatusClass">@autoSaveStatus</MudText>
                                     }
-                                    <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Small" Title="Undo (Coming Soon)" Disabled="true" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Small" Disabled="true" />
                                 </div>
                             </div>
                         </div>
@@ -214,43 +214,44 @@
     .tracking-wider { letter-spacing: 0.1em; }
     .uppercase-tracking { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.75rem; font-weight: 800; }
     .opacity-60 { opacity: 0.6; }
-    .primary-text { color: var(--mud-palette-primary); }
-    .secondary-text { color: var(--mud-palette-text-secondary); }
+    .primary-text { color: var(--primary-color); }
+    .secondary-text { color: var(--text-secondary); }
 
     .primary-gradient-text {
-        background: linear-gradient(135deg, var(--mud-palette-primary) 0%, var(--mud-palette-secondary) 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
     .glass {
-        backdrop-filter: blur(10px);
-        background: rgba(var(--mud-palette-surface-rgb), 0.8) !important;
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05) !important;
+        background: var(--surface-1) !important;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: var(--shadow-md);
     }
     .glass-inner {
-        background: rgba(var(--mud-palette-surface-rgb), 0.5) !important;
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05) !important;
+        background: rgba(255, 255, 255, 0.7) !important;
+        border: 1px solid var(--border-color) !important;
     }
 
     .rounded-xxl { border-radius: 2rem; }
 
     .title-h1-input {
-        font-size: 2.5rem;
-        font-weight: 900;
+        font-size: 2.4rem;
+        font-weight: 800;
         background: transparent;
         border: none;
         outline: none;
-        color: var(--mud-palette-text-primary);
+        color: var(--text-primary);
         width: 100%;
         letter-spacing: -0.02em;
+        font-family: var(--font-heading);
     }
-    .title-h1-input::placeholder { color: var(--mud-palette-text-secondary); opacity: 0.3; }
+    .title-h1-input::placeholder { color: var(--text-secondary); opacity: 0.35; }
 
     .minimal-toolbar {
-        background: rgba(var(--mud-palette-surface-rgb), 0.5) !important;
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05);
-        color: var(--mud-palette-text-secondary);
+        background: rgba(255, 255, 255, 0.6) !important;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
     }
 
     .zen-textarea {
@@ -259,36 +260,37 @@
         background: transparent;
         border: none;
         outline: none;
-        font-size: 1.15rem;
-        line-height: 1.7;
-        color: var(--mud-palette-text-primary);
-        font-family: 'Georgia', serif;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-primary);
+        font-family: var(--font-body);
         resize: vertical;
     }
-    .zen-textarea::placeholder { opacity: 0.2; }
+    .zen-textarea::placeholder { opacity: 0.4; }
 
     .markdown-preview-area {
         min-height: 500px;
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        font-family: var(--font-body);
         line-height: 1.7;
+        color: var(--text-primary);
     }
 
-    .border-top-light { border-top: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05); }
+    .border-top-light { border-top: 1px solid var(--border-color); }
 
     .tag-pill {
-        background: rgba(var(--mud-palette-surface-rgb), 0.2);
-        color: var(--mud-palette-text-secondary);
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.1);
+        background: rgba(31, 43, 42, 0.05);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
         padding: 4px 12px;
         border-radius: 8px;
         font-size: 0.75rem;
         font-weight: 600;
         transition: all 0.2s ease;
     }
-    .tag-pill:hover { background: rgba(var(--mud-palette-primary-rgb), 0.05); color: var(--mud-palette-primary); }
-    .tag-pill.active { background: var(--mud-palette-primary); color: white; border-color: var(--mud-palette-primary); }
+    .tag-pill:hover { background: var(--primary-light); color: var(--text-primary); }
+    .tag-pill.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-    .shadow-primary { box-shadow: 0 10px 15px -3px rgba(var(--mud-palette-primary-rgb), 0.3); }
+    .shadow-primary { box-shadow: 0 10px 15px -3px rgba(47, 107, 95, 0.3); }
     
     .animate-fade-in {
         animation: fade-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -320,3 +322,5 @@
         }
     }
 }
+
+

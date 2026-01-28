@@ -3,30 +3,73 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
-<div class="top-nav">
-    <MudNavLink href="dashboard" Match="NavLinkMatch.All" Class="nav-chip" Icon="@Icons.Material.Filled.Explore">Dashboard</MudNavLink>
-    <MudNavLink href="entries" Match="NavLinkMatch.Prefix" Class="nav-chip" Icon="@Icons.Material.Filled.ViewTimeline">Journal</MudNavLink>
-    <MudNavLink href="calendar" Match="NavLinkMatch.Prefix" Class="nav-chip" Icon="@Icons.Material.Filled.CalendarToday">Calendar</MudNavLink>
-    <MudNavLink href="analytics" Match="NavLinkMatch.Prefix" Class="nav-chip" Icon="@Icons.Material.Filled.BlurOn">Insights</MudNavLink>
-    <MudNavLink href="settings" Match="NavLinkMatch.Prefix" Class="nav-chip" Icon="@Icons.Material.Filled.Tune">Settings</MudNavLink>
+<div class="nav-dock">
+    <MudNavLink href="dashboard" Match="NavLinkMatch.All" Class="dock-link" Icon="@Icons.Material.Filled.Explore">Dashboard</MudNavLink>
+    <MudNavLink href="entries" Match="NavLinkMatch.Prefix" Class="dock-link" Icon="@Icons.Material.Filled.ViewTimeline">Journal</MudNavLink>
+    <MudNavLink href="calendar" Match="NavLinkMatch.Prefix" Class="dock-link" Icon="@Icons.Material.Filled.CalendarToday">Calendar</MudNavLink>
+    <MudNavLink href="analytics" Match="NavLinkMatch.Prefix" Class="dock-link" Icon="@Icons.Material.Filled.BlurOn">Insights</MudNavLink>
+    <MudNavLink href="settings" Match="NavLinkMatch.Prefix" Class="dock-link" Icon="@Icons.Material.Filled.Tune">Settings</MudNavLink>
 </div>
 
 <style>
-    .top-nav { display: flex; align-items: center; gap: 0.25rem; }
-    .nav-chip {
-        border-radius: 12px !important;
-        padding: 0.35rem 0.75rem !important;
+    .nav-dock {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.2rem;
+        align-items: center;
+    }
+
+    .dock-link {
+        border-radius: 999px !important;
+        padding: 0.45rem 0.3rem !important;
         font-weight: 700 !important;
         text-transform: none !important;
-        color: #cdd6f4 !important;
+        color: #1f2b2a !important;
         transition: all 0.2s ease !important;
+        border: 1px solid rgba(31, 43, 42, 0.08);
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.2rem;
+        font-size: 0.75rem !important;
+        min-width: 0 !important;
     }
-    .nav-chip:hover { background: rgba(255, 255, 255, 0.08) !important; color: #f7f8ff !important; transform: translateY(-1px); }
-    .nav-chip.active { background: linear-gradient(120deg, #f6c344, #f0618f) !important; color: #0b0f1c !important; box-shadow: 0 10px 28px rgba(240, 97, 143, 0.35); }
-</style>
 
-@code {
-    protected override void OnInitialized()
-    {
+    .dock-link .mud-nav-link-icon {
+        margin: 0 !important;
+        font-size: 1.1rem !important;
+        color: inherit !important;
     }
-}
+
+    .dock-link:hover {
+        background: rgba(47, 107, 95, 0.12) !important;
+        color: #1f2b2a !important;
+    }
+
+    .dock-link.active {
+        background: linear-gradient(120deg, rgba(47, 107, 95, 0.22), rgba(201, 106, 75, 0.22)) !important;
+        color: #1f2b2a !important;
+        border-color: rgba(47, 107, 95, 0.35) !important;
+        box-shadow: 0 8px 18px rgba(47, 107, 95, 0.18);
+    }
+
+    [data-theme="Dark"] .dock-link {
+        color: #e8f0ed !important;
+        border-color: rgba(232, 240, 237, 0.2);
+    }
+
+    [data-theme="Dark"] .dock-link:hover {
+        background: rgba(121, 182, 160, 0.18) !important;
+        color: #e8f0ed !important;
+    }
+
+    [data-theme="Dark"] .dock-link.active {
+        background: linear-gradient(120deg, rgba(121, 182, 160, 0.28), rgba(242, 160, 123, 0.28)) !important;
+        color: #101716 !important;
+        border-color: rgba(121, 182, 160, 0.4) !important;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    @@media (max-width: 540px) {
+        .dock-link { font-size: 0.65rem !important; }
+    }
+</style>

@@ -5,8 +5,8 @@
 <PageTitle>Settings - Journal App</PageTitle>
 
 <div class="animate-fade-in">
-    <MudText Typo="Typo.h3" Class="fw-extra-bold peace-text mb-2">Workspace & Security ✨</MudText>
-    <MudText Typo="Typo.h6" Class="secondary-text opacity-60 mb-10">Customize your brilliant environment and vault protection.</MudText>
+    <MudText Typo="Typo.h3" Class="fw-extra-bold peace-text mb-2">Workspace & Security</MudText>
+    <MudText Typo="Typo.h6" Class="secondary-text opacity-60 mb-10">Customize your workspace and vault protection.</MudText>
 </div>
 
 <MudGrid>
@@ -47,7 +47,7 @@
                     <MudDatePicker @bind-Date="exportEndDate" Label="To" Variant="Variant.Outlined" Class="rounded-lg" />
                 </MudItem>
             </MudGrid>
-            <MudButton OnClick="ExportToPdf" Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.PictureAsPdf" Class="rounded-pill px-8 py-3 shadow-success" Disabled="@isExporting" Loading="@isExporting">
+            <MudButton OnClick="ExportToPdf" Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.PictureAsPdf" Class="rounded-pill px-8 py-3 shadow-success" Disabled="@isExporting" loading="@isExporting">
                 Generate PDF Archive
             </MudButton>
         </div>
@@ -82,14 +82,13 @@
     .opacity-60 { opacity: 0.6; }
     
     .peace-text {
-        color: var(--primary-color) !important;
+        color: var(--secondary-color) !important;
     }
 
     .glass {
-        backdrop-filter: blur(10px);
-        background: rgba(var(--mud-palette-surface-rgb), 0.8) !important;
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05) !important;
-        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+        background: var(--surface-1) !important;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: var(--shadow-md);
     }
 
     .rounded-xxl { border-radius: 2rem; }
@@ -102,16 +101,16 @@
         align-items: center;
         justify-content: center;
     }
-    .icon-box.primary { background: rgba(var(--mud-palette-primary-rgb), 0.1); color: var(--mud-palette-primary); }
-    .icon-box.secondary { background: rgba(var(--mud-palette-secondary-rgb), 0.1); color: var(--mud-palette-secondary); }
-    .icon-box.tertiary { background: rgba(var(--mud-palette-tertiary-rgb), 0.1); color: var(--mud-palette-tertiary); }
-    .icon-box.success { background: rgba(var(--mud-palette-success-rgb), 0.1); color: var(--mud-palette-success); }
-    .icon-box.warning { background: rgba(var(--mud-palette-warning-rgb), 0.1); color: var(--mud-palette-warning); }
+    .icon-box.primary { background: rgba(47, 107, 95, 0.12); color: var(--primary-color); }
+    .icon-box.secondary { background: rgba(201, 106, 75, 0.12); color: var(--secondary-color); }
+    .icon-box.tertiary { background: rgba(224, 179, 106, 0.15); color: var(--accent-color); }
+    .icon-box.success { background: rgba(47, 143, 106, 0.12); color: var(--success-color); }
+    .icon-box.warning { background: rgba(214, 149, 61, 0.12); color: var(--warning-color); }
 
     .theme-pill {
         padding: 12px 20px;
         border-radius: 12px;
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.1);
+        border: 1px solid var(--border-color);
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -119,29 +118,30 @@
         flex: 1;
         justify-content: center;
         font-weight: 600;
-        color: var(--mud-palette-text-secondary);
+        color: var(--text-secondary);
+        background: rgba(255, 255, 255, 0.7);
     }
-    .theme-pill:hover { background: rgba(var(--mud-palette-primary-rgb), 0.05); }
+    .theme-pill:hover { background: var(--primary-light); }
     .theme-pill.active {
-        background: var(--mud-palette-primary);
+        background: var(--primary-color);
         color: white;
-        border-color: var(--mud-palette-primary);
-        box-shadow: 0 4px 12px -2px rgba(var(--mud-palette-primary-rgb), 0.3);
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px -2px rgba(47, 107, 95, 0.3);
     }
 
     .pin-status { border: 1px solid transparent; }
-    .pin-status.active { background: rgba(var(--mud-palette-success-rgb), 0.05); border-color: rgba(var(--mud-palette-success-rgb), 0.1); color: var(--mud-palette-success); }
-    .pin-status.warning { background: rgba(var(--mud-palette-warning-rgb), 0.05); border-color: rgba(var(--mud-palette-warning-rgb), 0.1); color: var(--mud-palette-warning); }
+    .pin-status.active { background: rgba(47, 143, 106, 0.1); border-color: rgba(47, 143, 106, 0.15); color: var(--success-color); }
+    .pin-status.warning { background: rgba(214, 149, 61, 0.1); border-color: rgba(214, 149, 61, 0.15); color: var(--warning-color); }
 
-    .shadow-primary { box-shadow: 0 8px 16px -4px rgba(var(--mud-palette-primary-rgb), 0.4); }
-    .shadow-success { box-shadow: 0 8px 16px -4px rgba(var(--mud-palette-success-rgb), 0.4); }
+    .shadow-primary { box-shadow: 0 8px 16px -4px rgba(47, 107, 95, 0.4); }
+    .shadow-success { box-shadow: 0 8px 16px -4px rgba(47, 143, 106, 0.4); }
 
     .glow-button {
         transition: all 0.3s ease;
     }
     .glow-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px -6px rgba(var(--mud-palette-primary-rgb), 0.5);
+        box-shadow: 0 12px 24px -6px rgba(47, 107, 95, 0.4);
     }
 
     .animate-fade-in {
@@ -152,3 +152,5 @@
         to { opacity: 1; transform: translateY(0); }
     }
 </style>
+
+

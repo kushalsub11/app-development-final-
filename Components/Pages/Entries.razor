@@ -17,8 +17,8 @@
 
     <div class="d-flex align-center justify-space-between mb-8 animate-fade-in">
         <div>
-            <MudText Typo="Typo.h3" Class="fw-bold peace-text mb-2">Your Captured Sparks ✨</MudText>
-            <MudText Typo="Typo.h6" Class="secondary-text opacity-75">A timeline of your growth, memories, and brilliant ideas.</MudText>
+            <MudText Typo="Typo.h3" Class="fw-bold peace-text mb-2">Your Journal Archive</MudText>
+            <MudText Typo="Typo.h6" Class="secondary-text opacity-75">A catalog of notes, moods, and moments.</MudText>
         </div>
         <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Large" OnClick='(() => Navigation.NavigateTo("/create-entry"))' Class="rounded-pill px-8 py-3 shadow-lg hover-scale">
             New Entry
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Search and Filter Bar -->
-    <MudPaper Elevation="0" Class="pa-6 rounded-xl mb-10 border-none shadow-md glass-panel" Style="background: var(--mud-palette-surface);">
+    <MudPaper Elevation="0" Class="pa-6 rounded-xl mb-10 border-none shadow-md glass-panel" Style="background: var(--surface-1);">
         <MudGrid Spacing="3" Class="align-center">
             <MudItem xs="12" md="6">
                 <MudTextField @bind-Value="searchTerm" Label="Search reflections" Placeholder="Describe what you're looking for..." 
@@ -41,7 +41,7 @@
                 </MudButton>
                 @if (filterStartDate.HasValue || filterEndDate.HasValue || !string.IsNullOrEmpty(selectedMood) || !string.IsNullOrEmpty(selectedTag))
                 {
-                    <MudIconButton Icon="@Icons.Material.Filled.FilterAltOff" Color="Color.Error" OnClick="ClearFilters" Title="Clear All Filters" Class="hover-scale" />
+                    <MudIconButton Icon="@Icons.Material.Filled.FilterAltOff" Color="Color.Error" OnClick="ClearFilters" Class="hover-scale" />
                 }
             </MudItem>
             
@@ -110,7 +110,7 @@
             @foreach (var entry in entries)
             {
                 <MudItem xs="12" sm="6" md="4">
-                    <div class="premium-entry-card-full glass h-100 shadow-lg vibrant-card" @onclick='@(() => HandleEntryClick(entry))'>
+                    <div class="premium-entry-card-full glass h-100 shadow-lg " @onclick='@(() => HandleEntryClick(entry))'>
                         <div class="entry-card-header mb-6">
                             <div class="mood-badge-premium @entry.PrimaryMoodCategory.ToString().ToLower()" style="position: relative;">
                                 @GetMoodEmoji(entry.PrimaryMoodCategory)
@@ -134,7 +134,7 @@
                             }
                             else
                             {
-                                <MudText Typo="Typo.body2" Color="Color.Warning" Class="opacity-75 italic">✨ Encrypted in your personal vault. Click to unlock. ✨</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Warning" Class="opacity-75 italic">Encrypted in your personal vault. Click to unlock.</MudText>
                             }
                         </div>
 
@@ -188,67 +188,67 @@
     .uppercase-tracking { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.75rem; font-weight: 800; }
     .opacity-75 { opacity: 0.75; }
     .opacity-60 { opacity: 0.6; }
-    .primary-text { color: var(--mud-palette-primary); }
-    .secondary-text { color: var(--mud-palette-text-secondary); }
+    .primary-text { color: var(--primary-color); }
+    .secondary-text { color: var(--text-secondary); }
 
-    .peace-text {
-        color: var(--primary-color) !important;
-    }
+    .peace-text { color: var(--secondary-color) !important; }
 
     .glass-panel {
-        backdrop-filter: blur(10px);
-        background: rgba(var(--mud-palette-surface-rgb), 0.8) !important;
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05) !important;
+        background: var(--surface-1) !important;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: var(--shadow-sm);
     }
 
     .premium-entry-card-full {
-        background: var(--mud-palette-surface);
+        background: var(--surface-1);
         border-radius: 1.5rem;
         padding: 1.75rem;
         display: flex;
         flex-direction: column;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
     }
     .premium-entry-card-full:hover {
-        transform: translateY(-8px);
-        border-color: rgba(var(--mud-palette-primary-rgb), 0.2);
-        box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);
+        transform: translateY(-6px);
+        border-color: rgba(47, 107, 95, 0.35);
+        box-shadow: var(--shadow-md);
     }
 
     .mood-badge-premium {
         width: 54px;
         height: 54px;
-        border-radius: 14px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.75rem;
         flex-shrink: 0;
+        color: #f7f2e9;
+        box-shadow: 0 10px 20px rgba(31, 43, 42, 0.15);
     }
-    .mood-badge-premium.positive { background: rgba(16, 185, 129, 0.1); }
-    .mood-badge-premium.neutral { background: rgba(59, 130, 246, 0.1); }
-    .mood-badge-premium.negative { background: rgba(239, 68, 68, 0.1); }
+    .mood-badge-premium.positive { background: #2f8f6a; }
+    .mood-badge-premium.neutral { background: #5c8db8; }
+    .mood-badge-premium.negative { background: #c9554b; }
 
     .lock-overlay {
         position: absolute;
         bottom: -4px;
         right: -4px;
-        background: #1A1F36;
-        border: 2px solid #FFD700;
+        background: var(--surface-1);
+        border: 2px solid var(--accent-color);
         border-radius: 50%;
         width: 24px;
         height: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        box-shadow: 0 2px 6px rgba(31, 43, 42, 0.25);
     }
 
     .modern-tag {
-        background: rgba(var(--mud-palette-primary-rgb), 0.05);
-        color: var(--mud-palette-primary);
+        background: var(--primary-light);
+        color: var(--text-primary);
         padding: 4px 12px;
         border-radius: 8px;
         font-size: 0.7rem;
@@ -259,35 +259,35 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        background: rgba(var(--mud-palette-surface-rgb), 0.3);
+        background: rgba(31, 43, 42, 0.06);
         padding: 4px 12px;
         border-radius: 50px;
-        color: var(--mud-palette-text-secondary);
+        color: var(--text-secondary);
         font-size: 0.8rem;
     }
 
     .empty-state-container {
         text-align: center;
         padding: 6rem 2rem;
-        background: rgba(var(--mud-palette-primary-rgb), 0.02);
+        background: rgba(255, 255, 255, 0.7);
         border-radius: 2rem;
-        border: 2px dashed rgba(var(--mud-palette-divider-rgb), 0.1);
+        border: 1px dashed var(--border-light);
     }
     .empty-state-visual {
         width: 100px;
         height: 100px;
-        background: var(--mud-palette-surface);
+        background: var(--surface-1);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        box-shadow: var(--shadow-sm);
     }
-    .empty-state-visual .mud-icon-root { font-size: 48px !important; color: var(--mud-palette-primary); }
+    .empty-state-visual .mud-icon-root { font-size: 48px !important; color: var(--primary-color); }
 
-    .shadow-primary { box-shadow: 0 8px 16px -4px rgba(var(--mud-palette-primary-rgb), 0.4); }
-    .hover-scale:hover { transform: scale(1.05); }
+    .shadow-primary { box-shadow: 0 8px 16px -4px rgba(47, 107, 95, 0.35); }
+    .hover-scale:hover { transform: scale(1.03); }
     .hover-scale-small:hover { transform: scale(1.1); }
 
     .line-clamp-4 {
@@ -306,3 +306,7 @@
 
 @code {
 }
+
+
+
+

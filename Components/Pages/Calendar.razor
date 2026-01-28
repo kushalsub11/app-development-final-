@@ -18,7 +18,7 @@
     <div class="d-flex align-center justify-space-between mb-8 animate-fade-in">
         <div>
             <MudText Typo="Typo.h3" Class="fw-bold primary-gradient-text">Journal Calendar</MudText>
-            <MudText Typo="Typo.h6" Color="Color.Secondary" Class="mt-1 opacity-75">Travel through your past reflections and moods.</MudText>
+            <MudText Typo="Typo.h6" Color="Color.Secondary" Class="mt-1 opacity-75">Browse your past reflections and moods.</MudText>
         </div>
         <div class="d-flex gap-2">
             <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Today" OnClick="() => currentDate = DateTime.Today" Class="rounded-pill px-6">Today</MudButton>
@@ -30,7 +30,7 @@
 
     <MudGrid Spacing="4" Class="animate-fade-in-up">
         <MudItem xs="12" lg="8">
-            <MudPaper Elevation="0" Class="pa-8 rounded-xl shadow-lg border border-opacity-10 overflow-hidden glass-panel" Style="background: var(--mud-palette-surface);">
+            <MudPaper Elevation="0" Class="pa-8 rounded-xl shadow-lg border border-opacity-10 overflow-hidden glass-panel" Style="background: var(--surface-1);">
                 <div class="calendar-nav-header mb-8">
                     <MudIconButton Icon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" OnClick="PreviousMonth" Class="nav-btn-modern" />
                     <div class="text-center px-4">
@@ -85,7 +85,7 @@
                 @if (selectedDate != null)
                 {
                     <div class="animate-slide-left-fade h-100">
-                        <MudPaper Elevation="0" Class="pa-8 rounded-xl shadow-xl h-100 d-flex flex-column border border-opacity-10 glass-panel" Style="background: var(--mud-palette-surface); min-height: 500px;">
+                        <MudPaper Elevation="0" Class="pa-8 rounded-xl shadow-xl h-100 d-flex flex-column border border-opacity-10 glass-panel" Style="background: var(--surface-1); min-height: 500px;">
                             <div class="d-flex align-center gap-5 mb-8">
                                 <div class="date-badge-premium">
                                     <span class="month">@selectedDate.Value.ToString("MMM")</span>
@@ -165,7 +165,7 @@
                 else
                 {
                     <MudPaper Elevation="0" Class="pa-12 rounded-xl border-2 border-dashed d-flex flex-column align-center justify-center text-center h-100 glass-panel empty-selection-placeholder" 
-                              Style="border-color: rgba(var(--mud-palette-primary-rgb), 0.15); background: transparent; min-height: 500px;">
+                              Style="border-color: var(--border-light); background: transparent; min-height: 500px;">
                         <div class="pulse-ring mb-8">
                             <MudIcon Icon="@Icons.Material.Filled.CalendarMonth" Size="Size.Large" Color="Color.Primary" />
                         </div>
@@ -181,95 +181,95 @@
 <style>
     .fw-bold { font-weight: 700 !important; }
     .fw-extra-bold { font-weight: 900 !important; }
-    .uppercase-tracking { text-transform: uppercase; letter-spacing: 0.15em; font-size: 0.8rem; }
+    .uppercase-tracking { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.8rem; }
     .opacity-60 { opacity: 0.6; }
-    .secondary-text { color: var(--mud-palette-text-secondary); }
+    .secondary-text { color: var(--text-secondary); }
 
     .primary-gradient-text {
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
     .glass-panel {
-        backdrop-filter: blur(10px);
-        background: rgba(var(--mud-palette-surface-rgb), 0.8) !important;
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05) !important;
+        background: var(--surface-1) !important;
+        border: 1px solid var(--border-color) !important;
+        box-shadow: var(--shadow-md);
     }
 
     .nav-btn-modern {
-        background: rgba(var(--mud-palette-primary-rgb), 0.08) !important;
+        background: rgba(47, 107, 95, 0.08) !important;
         border-radius: 12px !important;
         padding: 10px !important;
         transition: all 0.2s;
     }
     .nav-btn-modern:hover {
-        background: var(--mud-palette-primary) !important;
+        background: var(--primary-color) !important;
         color: white !important;
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 
     .calendar-grid-modern {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 16px;
+        gap: 14px;
     }
     .calendar-weekday-header {
         text-align: center;
         font-weight: 800;
         font-size: 0.7rem;
-        padding-bottom: 1.5rem;
-        color: var(--mud-palette-text-secondary);
-        opacity: 0.5;
+        padding-bottom: 1.2rem;
+        color: var(--text-secondary);
+        opacity: 0.7;
         letter-spacing: 0.1em;
     }
 
     .calendar-day-cell {
         aspect-ratio: 1/1;
-        border-radius: 1.5rem;
-        background: rgba(var(--mud-palette-surface-rgb), 0.03);
+        border-radius: 1.25rem;
+        background: rgba(255, 255, 255, 0.7);
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         position: relative;
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
     }
     .calendar-day-cell:hover {
-        transform: translateY(-5px);
-        background: rgba(var(--mud-palette-primary-rgb), 0.05);
-        border-color: rgba(var(--mud-palette-primary-rgb), 0.1);
+        transform: translateY(-4px);
+        border-color: rgba(47, 107, 95, 0.3);
+        box-shadow: var(--shadow-sm);
     }
     .calendar-day-cell.selected {
-        background: var(--mud-palette-primary) !important;
-        border-color: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 15px 30px -10px rgba(var(--mud-palette-primary-rgb), 0.5);
+        background: var(--primary-color) !important;
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 15px 30px -10px rgba(47, 107, 95, 0.4);
     }
     .calendar-day-cell.selected .day-label { color: white !important; }
-    .calendar-day-cell.selected .entry-emoji-float { opacity: 1; transform: scale(1.2); }
-    .calendar-day-cell.other-month { opacity: 0.2; cursor: default; }
+    .calendar-day-cell.selected .entry-emoji-float { opacity: 1; transform: scale(1.15); }
+    .calendar-day-cell.other-month { opacity: 0.25; cursor: default; }
     
     .today-cell .day-label {
-        color: var(--mud-palette-primary);
+        color: var(--primary-color);
         font-weight: 900;
     }
     .today-cell:not(.selected) {
-        border-color: rgba(var(--mud-palette-primary-rgb), 0.3);
-        background: rgba(var(--mud-palette-primary-rgb), 0.02);
+        border-color: rgba(47, 107, 95, 0.3);
+        background: rgba(47, 107, 95, 0.05);
     }
 
-    .day-label { font-size: 1.25rem; font-weight: 700; color: var(--mud-palette-text-primary); transition: color 0.2s; }
+    .day-label { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); transition: color 0.2s; }
 
     .mood-glow {
         position: absolute;
-        inset: 4px;
-        border-radius: 1.25rem;
-        opacity: 0.08;
+        inset: 6px;
+        border-radius: 1.1rem;
+        opacity: 0.12;
     }
-    .mood-glow.positive { background: #10b981; }
-    .mood-glow.neutral { background: #3b82f6; }
-    .mood-glow.negative { background: #ef4444; }
+    .mood-glow.positive { background: #2f8f6a; }
+    .mood-glow.neutral { background: #5c8db8; }
+    .mood-glow.negative { background: #c9554b; }
 
     .entry-indicator-premium {
         position: absolute;
@@ -281,9 +281,9 @@
         align-items: center;
         justify-content: center;
     }
-    .entry-indicator-premium.positive { background: #10b981; box-shadow: 0 0 10px #10b981; }
-    .entry-indicator-premium.neutral { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
-    .entry-indicator-premium.negative { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+    .entry-indicator-premium.positive { background: #2f8f6a; box-shadow: 0 0 10px #2f8f6a; }
+    .entry-indicator-premium.neutral { background: #5c8db8; box-shadow: 0 0 10px #5c8db8; }
+    .entry-indicator-premium.negative { background: #c9554b; box-shadow: 0 0 10px #c9554b; }
 
     .entry-emoji-float {
         position: absolute;
@@ -300,25 +300,26 @@
         justify-content: center;
         flex-wrap: wrap;
     }
-    .legend-item { display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; font-weight: 700; color: var(--mud-palette-text-secondary); }
+    .legend-item { display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); }
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .legend-dot.status-positive { background: #10b981; }
-    .legend-dot.status-neutral { background: #3b82f6; }
-    .legend-dot.status-negative { background: #ef4444; }
-    .legend-pill-today { width: 14px; height: 14px; border-radius: 4px; border: 2.5px solid var(--mud-palette-primary); }
+    .legend-dot.status-positive { background: #2f8f6a; }
+    .legend-dot.status-neutral { background: #5c8db8; }
+    .legend-dot.status-negative { background: #c9554b; }
+    .legend-pill-today { width: 14px; height: 14px; border-radius: 4px; border: 2.5px solid var(--primary-color); }
 
     .date-badge-premium {
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-        color: white;
+        background: linear-gradient(135deg, rgba(47, 107, 95, 0.18) 0%, rgba(201, 106, 75, 0.18) 100%);
+        color: var(--text-primary);
         padding: 1rem;
         border-radius: 1.25rem;
         display: flex;
         flex-direction: column;
         align-items: center;
         min-width: 75px;
-        box-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.4);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
     }
-    .date-badge-premium .month { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.8; margin-bottom: 2px; }
+    .date-badge-premium .month { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.7; margin-bottom: 2px; }
     .date-badge-premium .day { font-size: 1.75rem; font-weight: 900; line-height: 1; }
 
     .mood-chip-premium {
@@ -330,45 +331,47 @@
         font-weight: 800;
         font-size: 0.9rem;
         box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        border: 1px solid var(--border-color);
+        background: rgba(255, 255, 255, 0.7);
     }
-    .mood-chip-premium.positive { background: rgba(16, 185, 129, 0.1); color: #059669; }
-    .mood-chip-premium.neutral { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
-    .mood-chip-premium.negative { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
+    .mood-chip-premium.positive { color: #2f8f6a; }
+    .mood-chip-premium.neutral { color: #5c8db8; }
+    .mood-chip-premium.negative { color: #c9554b; }
 
     .stat-pill {
         display: flex;
         align-items: center;
         gap: 6px;
-        background: rgba(var(--mud-palette-surface-rgb), 0.05);
+        background: rgba(31, 43, 42, 0.06);
         padding: 6px 14px;
         border-radius: 50px;
         font-size: 0.8rem;
         font-weight: 600;
-        color: var(--mud-palette-text-secondary);
+        color: var(--text-secondary);
     }
 
     .entry-preview-box {
-        background: rgba(var(--mud-palette-surface-rgb), 0.03);
+        background: rgba(255, 255, 255, 0.7);
         border-radius: 1.25rem;
         padding: 1.5rem;
-        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05);
+        border: 1px solid var(--border-color);
     }
     .entry-body-text {
         font-size: 1.05rem;
         line-height: 1.8;
-        color: var(--mud-palette-text-primary);
+        color: var(--text-primary);
         opacity: 0.85;
         white-space: pre-wrap;
     }
 
     .tag-chip-minimal {
-        background: rgba(var(--mud-palette-primary-rgb), 0.05);
-        color: var(--mud-palette-primary);
+        background: var(--primary-light);
+        color: var(--text-primary);
         padding: 4px 12px;
         border-radius: 8px;
         font-size: 0.75rem;
         font-weight: 700;
-        border: 1px solid rgba(var(--mud-palette-primary-rgb), 0.1);
+        border: 1px solid rgba(47, 107, 95, 0.1);
     }
 
     .visual-anchor {
@@ -377,12 +380,12 @@
         align-items: center;
         justify-content: center;
     }
-    .anchor-icon { font-size: 64px !important; color: var(--mud-palette-primary); opacity: 0.8; position: relative; z-index: 2; }
+    .anchor-icon { font-size: 64px !important; color: var(--primary-color); opacity: 0.8; position: relative; z-index: 2; }
     .blob-animation {
         position: absolute;
         width: 120px;
         height: 120px;
-        background: rgba(var(--mud-palette-primary-rgb), 0.1);
+        background: rgba(47, 107, 95, 0.12);
         border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
         animation: blob-swing 8s ease-in-out infinite;
         z-index: 1;
@@ -394,7 +397,7 @@
         justify-content: center;
         width: 80px;
         height: 80px;
-        background: rgba(var(--mud-palette-primary-rgb), 0.05);
+        background: rgba(47, 107, 95, 0.08);
         border-radius: 50%;
         position: relative;
     }
@@ -402,14 +405,14 @@
         content: "";
         position: absolute;
         inset: -10px;
-        border: 2px solid rgba(var(--mud-palette-primary-rgb), 0.1);
+        border: 2px solid rgba(47, 107, 95, 0.12);
         border-radius: 50%;
         animation: pulse-out 2s infinite;
     }
 
-    .shadow-primary { box-shadow: 0 10px 25px -5px rgba(var(--mud-palette-primary-rgb), 0.4); }
-    .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(var(--mud-palette-primary-rgb), 0.5); }
-    .hover-scale:hover { transform: scale(1.05); }
+    .shadow-primary { box-shadow: 0 10px 25px -5px rgba(47, 107, 95, 0.4); }
+    .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(47, 107, 95, 0.4); }
+    .hover-scale:hover { transform: scale(1.03); }
 
     @@keyframes blob-swing {
         0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(1); }
@@ -437,3 +440,6 @@
 
 @code {
 }
+
+
+

@@ -5,9 +5,7 @@
 @inject SettingsService SettingsService
 @inject IJSRuntime JSRuntime
 
-@* [VIVA INFO]: MainLayout is the 'Shell' of the application. 
-   It contains the Sidebar, Header, and Theme configuration that persist across all pages.
-*@
+@* Layout shell with floating controls and bottom navigation. *@
 
 <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
 <MudPopoverProvider />
@@ -15,132 +13,217 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="0" Class="new-appbar">
-        <div class="brand-mark" @onclick='() => Navigation.NavigateTo("/dashboard")'>
-            <span class="brand-glyph">✦</span>
-            <div>
-                <MudText Typo="Typo.subtitle1" Class="brand-title">Journal Studio</MudText>
-                <MudText Typo="Typo.caption" Class="brand-sub">Flow-first workspace</MudText>
-            </div>
-        </div>
+    <div class="floating-brand" @onclick='() => Navigation.NavigateTo("/dashboard")'>
+        <span class="brand-letter">J</span>
+    </div>
 
-        <div class="nav-rail">
-            <NavMenu />
+    @if (AuthState.IsAuthenticated)
+    {
+        <div class="floating-user-avatar">
+            <MudAvatar Color="Color.Secondary" Size="Size.Medium" Class="user-avatar-circle">
+                @AuthState.GetCurrentUsername()?[0].ToString().ToUpper()
+            </MudAvatar>
         </div>
+    }
 
-        <MudSpacer />
-        <div class="command-rail">
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" Class="chip-btn" OnClick='(() => Navigation.NavigateTo("/create-entry"))'>New entry</MudButton>
-            <MudIconButton Icon="@Icons.Material.Filled.DarkMode" Color="Color.Inherit" OnClick="ToggleTheme" Class="ghost-icon" />
-            @if (AuthState.IsAuthenticated)
-            {
-                <div class="user-inline">
-                    <MudAvatar Color="Color.Secondary" Size="Size.Medium" Class="shadow-sm">@AuthState.GetCurrentUsername()?[0].ToString().ToUpper()</MudAvatar>
-                    <div>
-                        <MudText Typo="Typo.caption" Class="muted">Signed in</MudText>
-                        <MudText Typo="Typo.body2" Class="fw-bold">@AuthState.GetCurrentUsername()</MudText>
-                    </div>
-                </div>
-            }
-        </div>
-    </MudAppBar>
+    <div class="theme-orb" @onclick="ToggleTheme">
+        <MudIcon Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                 Size="Size.Medium"
+                 Color="Color.Secondary" />
+    </div>
 
-    <MudMainContent Class="shell">
-        <div class="page-frame">
+    <MudMainContent Class="studio-main-content">
+        <div class="page-content-wrapper">
             @Body
         </div>
     </MudMainContent>
+
+    <div class="bottom-nav">
+        <NavMenu />
+    </div>
+
+    <button class="fab" @onclick='() => Navigation.NavigateTo("/create-entry")'>
+        <MudIcon Icon="@Icons.Material.Filled.Add" Class="fab-icon" />
+    </button>
 </MudLayout>
 
 <style>
-    :host { font-family: "Sora", "Inter", system-ui, sans-serif; }
+    :host { font-family: "Fraunces", "Manrope", serif; }
 
-    .new-appbar {
-        backdrop-filter: blur(18px) saturate(140%);
-        background: linear-gradient(90deg, rgba(16, 18, 32, 0.92), rgba(26, 17, 46, 0.88));
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 0.9rem 1.5rem;
+    .studio-main-content {
+        background: transparent;
+        padding-bottom: 110px;
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-content-wrapper {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 3rem;
+    }
+
+    .floating-brand {
+        position: fixed;
+        top: 1.4rem;
+        left: 1.4rem;
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(47, 107, 95, 0.2), rgba(201, 106, 75, 0.22));
         display: grid;
-        grid-template-columns: auto 1fr auto;
-        align-items: center;
-        gap: 1rem;
-        color: #e8ecf5;
+        place-items: center;
+        box-shadow: var(--shadow-md);
+        z-index: 1000;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(8px);
     }
 
-    .brand-mark { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
-    .brand-glyph {
-        width: 38px; height: 38px; border-radius: 14px;
-        display: grid; place-items: center;
-        background: linear-gradient(135deg, #f6c344, #f0618f);
-        color: #0b0f1c; font-weight: 800;
-        box-shadow: 0 10px 30px rgba(240, 97, 143, 0.35);
+    .brand-letter {
+        font-size: 24px;
+        font-weight: 800;
+        font-family: var(--font-heading);
     }
-    .brand-title { color: #f7f8ff; letter-spacing: -0.01em; font-weight: 800; }
-    .brand-sub { color: rgba(232, 236, 245, 0.7); }
 
-    .nav-rail { display: flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.5rem; border-radius: 16px; background: rgba(255, 255, 255, 0.04); }
+    .floating-brand:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
 
-    .command-rail { display: flex; align-items: center; gap: 0.75rem; }
-    .chip-btn { border-radius: 999px; text-transform: none; font-weight: 700; }
-    .ghost-icon { background: rgba(255, 255, 255, 0.04); border-radius: 12px; }
+    .floating-user-avatar {
+        position: fixed;
+        top: 1.4rem;
+        right: 1.4rem;
+        z-index: 1000;
+    }
 
-    .user-inline { display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0.75rem; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); }
-    .muted { color: rgba(232, 236, 243, 0.7); }
+    .user-avatar-circle {
+        box-shadow: var(--shadow-sm);
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
 
-    .shell { background: radial-gradient(circle at 10% 10%, rgba(111, 87, 217, 0.12), transparent 30%), radial-gradient(circle at 90% 20%, rgba(248, 180, 72, 0.12), transparent 32%), #0c0f1a; min-height: 100vh; }
-    .page-frame { max-width: 1440px; margin: 0 auto; padding: 2.5rem 2rem 3rem; }
+    .user-avatar-circle:hover {
+        transform: translateY(-2px);
+    }
 
-    .fw-bold { font-weight: 700 !important; }
-    .fw-extra-bold { font-weight: 900 !important; }
+    .theme-orb {
+        position: fixed;
+        bottom: 2.4rem;
+        left: 2rem;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--surface-1);
+        border: 1px solid var(--border-color);
+        display: grid;
+        place-items: center;
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        z-index: 1000;
+    }
 
-    .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
-    @@keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .theme-orb:hover {
+        transform: translateY(-2px);
+    }
 
-    @@media (max-width: 900px) {
-        .new-appbar { grid-template-columns: 1fr; align-items: flex-start; }
-        .nav-rail { flex-wrap: wrap; }
-        .command-rail { width: 100%; justify-content: space-between; flex-wrap: wrap; }
-        .page-frame { padding: 1.5rem; }
+    .bottom-nav {
+        position: fixed;
+        left: 50%;
+        bottom: 1.2rem;
+        transform: translateX(-50%);
+        width: min(720px, 92vw);
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(31, 43, 42, 0.22);
+        border-radius: 999px;
+        box-shadow: var(--shadow-lg);
+        backdrop-filter: blur(10px);
+        padding: 0.4rem 0.6rem;
+        z-index: 900;
+    }
+
+    [data-theme="Dark"] .bottom-nav {
+        background: rgba(19, 27, 26, 0.95);
+        border: 1px solid rgba(232, 240, 237, 0.18);
+    }
+
+    .fab {
+        position: fixed;
+        right: 2rem;
+        bottom: 2.2rem;
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        border: none;
+        background: var(--primary-color);
+        color: white;
+        box-shadow: var(--shadow-lg);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        z-index: 1000;
+    }
+
+    .fab:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .fab-icon {
+        font-size: 26px !important;
+    }
+
+    @@media (max-width: 700px) {
+        .page-content-wrapper { padding: 1.6rem 1.2rem 3rem; }
+        .floating-brand, .floating-user-avatar { position: absolute; }
+        .theme-orb { left: 1.2rem; }
+        .fab { right: 1.2rem; }
     }
 </style>
 
 @code {
-    bool _drawerOpen = true;
     private bool _isDarkMode = true;
     private MudThemeProvider _mudThemeProvider = null!;
-    
+
     private MudTheme _theme = new MudTheme()
     {
         PaletteLight = new PaletteLight()
         {
-            Primary = "#4D96FF",
-            Secondary = "#FF8A8A",
-            Tertiary = "#00EA9C",
-            Background = "#F8FAFC",
-            Surface = "#FFFFFF",
-            AppbarBackground = "#FFFFFF",
-            DrawerBackground = "#FFFFFF",
-            DrawerText = "#1A1F36",
-            TextPrimary = "#1A1F36",
-            TextSecondary = "#64748B",
-            ActionDefault = "#475569",
-            Divider = "rgba(0,0,0, 0.08)"
+            Primary = "#2F6B5F",
+            Secondary = "#C96A4B",
+            Tertiary = "#E0B36A",
+            Background = "#F7F2E9",
+            Surface = "#FFFBF5",
+            AppbarBackground = "#FFFBF5",
+            DrawerBackground = "#F1E7D8",
+            DrawerText = "#1F2B2A",
+            TextPrimary = "#1F2B2A",
+            TextSecondary = "#576B67",
+            ActionDefault = "#556864",
+            Divider = "rgba(31, 43, 42, 0.1)"
         },
         PaletteDark = new PaletteDark()
         {
-            Primary = "#4D96FF",       // Vibrant Blue
-            Secondary = "#FF8A8A",     // Soft Pink
-            Tertiary = "#00EA9C",      // Emerald
-            Surface = "#1A1F36",       // Navy Surface
-            Background = "#0A0D18",    // Deep Navy Background
-            DrawerBackground = "#12182B",
-            AppbarBackground = "rgba(10, 13, 24, 0.8)",
-            ActionDefault = "#94A3B8",
-            ActionDisabled = "rgba(148, 163, 184, 0.3)",
-            TextPrimary = "#F8FAFC",   
-            TextSecondary = "#A3ACC2", 
-            Divider = "rgba(255, 255, 255, 0.08)",
-            TableLines = "rgba(255, 255, 255, 0.05)"
+            Primary = "#79B6A0",
+            Secondary = "#F2A07B",
+            Tertiary = "#E8C26E",
+            Surface = "#151F1D",
+            Background = "#101716",
+            DrawerBackground = "#1B2624",
+            AppbarBackground = "rgba(16, 23, 22, 0.85)",
+            ActionDefault = "#9DB2AA",
+            ActionDisabled = "rgba(157, 178, 170, 0.3)",
+            TextPrimary = "#E8F0ED",
+            TextSecondary = "#B9C7C1",
+            Divider = "rgba(232, 240, 237, 0.12)",
+            TableLines = "rgba(232, 240, 237, 0.06)"
         }
     };
 
@@ -162,8 +245,11 @@
         SettingsService.ThemeChanged -= HandleThemeChanged;
     }
 
-    void DrawerToggle()
+    async Task ToggleTheme()
     {
-        _drawerOpen = !_drawerOpen;
+        _isDarkMode = !_isDarkMode;
+        var theme = _isDarkMode ? "Dark" : "Light";
+        await SettingsService.UpdateThemeAsync(theme);
+        await JSRuntime.InvokeVoidAsync("themeManager.applyTheme", theme);
     }
 }

@@ -16,8 +16,6 @@ namespace JournalApp.Components.Pages
     /// </summary>
     public partial class CreateEditEntry
     {
-        private ElementReference contentEditorRef;
-        
         [Inject]
         private AuthenticationService AuthenticationService { get; set; } = default!;
 
@@ -40,7 +38,6 @@ namespace JournalApp.Components.Pages
         
         // Enhanced editor features
         private bool showEmojiPicker = false;
-        private string selectedEmojiCategory = "Smileys";
         private bool isFullscreen = false;
         private string autoSaveStatus = "";
         private string autoSaveStatusClass = "";

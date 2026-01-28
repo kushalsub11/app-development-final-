@@ -207,7 +207,7 @@ namespace JournalApp.Services
             // Based on typical student implementations, let's assume a semi-colon or comma string.
             var allTags = entries
                 .Where(e => !string.IsNullOrEmpty(e.Tags))
-                .SelectMany(e => e.Tags.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+                .SelectMany(e => (e.Tags ?? string.Empty).Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
                 .Select(t => t.Trim())
                 .ToList();
 

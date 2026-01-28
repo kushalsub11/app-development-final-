@@ -29,8 +29,7 @@ namespace JournalApp.Components.Pages
         private ChangePinDto changePinModel = new();
         private User? currentUser;
         private string message = "";
-        private bool isSuccess = false;
-        private bool isExporting = false;
+private bool isExporting = false;
         private string _selectedTheme = "Dark";
         private string selectedTheme 
         { 
@@ -95,13 +94,11 @@ namespace JournalApp.Components.Pages
                 }
                 
                 message = "Profile synchronized successfully! ✨";
-                isSuccess = true;
                 Snackbar.Add(message, Severity.Success);
             }
             else
             {
                 message = result.Message;
-                isSuccess = false;
             }
         }
 
@@ -122,13 +119,11 @@ namespace JournalApp.Components.Pages
                 }
                 
                 message = result.Message;
-                isSuccess = true;
                 setPinModel = new();
             }
             else
             {
                 message = result.Message;
-                isSuccess = false;
             }
         }
 
@@ -142,13 +137,11 @@ namespace JournalApp.Components.Pages
             if (result.IsSuccess)
             {
                 message = result.Message;
-                isSuccess = true;
                 changePinModel = new();
             }
             else
             {
                 message = result.Message;
-                isSuccess = false;
             }
         }
 
@@ -177,7 +170,6 @@ namespace JournalApp.Components.Pages
                 if (!exportStartDate.HasValue || !exportEndDate.HasValue)
                 {
                     message = "Please select both a start and end date for your archive.";
-                    isSuccess = false;
                     Snackbar.Add(message, Severity.Warning);
                     return;
                 }
@@ -186,7 +178,6 @@ namespace JournalApp.Components.Pages
                 if (exportStartDate.Value > exportEndDate.Value)
                 {
                     message = "Start date must be before end date.";
-                    isSuccess = false;
                     Snackbar.Add(message, Severity.Warning);
                     return;
                 }
@@ -195,7 +186,6 @@ namespace JournalApp.Components.Pages
                 if (currentUser == null)
                 {
                     message = "User not found. Please log in again.";
-                    isSuccess = false;
                     Snackbar.Add(message, Severity.Error);
                     return;
                 }
@@ -222,7 +212,6 @@ namespace JournalApp.Components.Pages
                 if (result.StartsWith("Successfully"))
                 {
                     message = $"{result}\n\nFile saved to:\n{filePath}\n\nYou can find it in File Explorer -> Downloads -> JournalApp";
-                    isSuccess = true;
                     Snackbar.Add($"PDF exported! File saved to: {filePath}", Severity.Success);
 
                     // Try to open the PDF file
@@ -242,14 +231,12 @@ namespace JournalApp.Components.Pages
                 else
                 {
                     message = result;
-                    isSuccess = false;
                     Snackbar.Add($"Export failed: {result}", Severity.Error);
                 }
             }
             catch (Exception ex)
             {
                 message = $"Error exporting: {ex.Message}";
-                isSuccess = false;
                 Snackbar.Add(message, Severity.Error);
             }
             finally
@@ -276,3 +263,4 @@ namespace JournalApp.Components.Pages
         public string ConfirmPassword { get; set; } = "";
     }
 }
+

@@ -6,10 +6,6 @@ using MudBlazor;
 
 namespace JournalApp.Components.Pages
 {
-    /// <summary>
-    /// Dashboard page - demonstrates data binding, component lifecycle, and service abstraction.
-    /// Following coursework concepts: Dependency Injection, Separation of Concerns, and Event Handling.
-    /// </summary>
     public partial class Dashboard
     {
         [Inject] public AuthenticationStateService AuthState { get; set; } = default!;
@@ -23,13 +19,12 @@ namespace JournalApp.Components.Pages
         private AnalyticsData? analytics;
         private List<JournalEntry> recentEntries = new();
         private bool isLoading = true;
-        private string errorMessage = string.Empty; // Graceful error handling state
+        private string errorMessage = string.Empty;
 
         protected override async Task OnInitializedAsync()
         {
             try 
             {
-                // Accessing AuthState - demonstrates Separation of Concerns (SoC)
                 if (!AuthState.IsAuthenticated)
                 {
                     Navigation.NavigateTo("/login");
@@ -43,7 +38,6 @@ namespace JournalApp.Components.Pages
                 return;
             }
 
-            // [BYPASS]: No more app-wide PIN verification needed.
             await LoadDashboardDataAsync();
             }
             catch (Exception ex)
@@ -65,10 +59,7 @@ namespace JournalApp.Components.Pages
                 var userId = AuthState.GetCurrentUserId();
                 if (userId.HasValue)
                 {
-                    // Get analytics for current user
                     analytics = await AnalyticsService.GetAnalyticsAsync(userId.Value);
-
-                    // Get recent entries (last 5) for current user
                     recentEntries = await JournalService.GetAllEntriesAsync(userId.Value, page: 1, pageSize: 5);
                 }
             }
@@ -90,7 +81,6 @@ namespace JournalApp.Components.Pages
                 return;
             }
 
-            // Challenge for PIN
             var parameters = new DialogParameters { ["TargetPin"] = entry.Pin };
             var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
             var dialog = await DialogService.ShowAsync<JournalPinChallengeDialog>("Unlock Journal", parameters, options);
@@ -104,8 +94,35 @@ namespace JournalApp.Components.Pages
 
         private void ViewEntry(int entryId)
         {
-            // Navigate to entry detail page - demonstrates Navigation from PDF
-            Navigation.NavigateTo($"/edit-entry/{entryId}");
+            Navigation.NavigateTo($"/view-entry/{entryId}");
+        }
+
+        private string GetMoodEmoji(string mood)
+        {
+            return mood?.ToLower() switch
+            {
+                "happy" => "😊",
+                "excited" => "🤩",
+                "content" => "😌",
+                "calm" => "😇",
+                "sad" => "😢",
+                "anxious" => "😰",
+                "angry" => "😠",
+                "frustrated" => "😤",
+                "tired" => "😴",
+                "energetic" => "⚡",
+                "grateful" => "🙏",
+                "loved" => "❤️",
+                "hopeful" => "🌟",
+                "confused" => "😕",
+                "lonely" => "😔",
+                "stressed" => "😫",
+                "peaceful" => "☮️",
+                "inspired" => "💡",
+                "proud" => "🏆",
+                "disappointed" => "😞",
+                _ => "😐"
+            };
         }
     }
 }

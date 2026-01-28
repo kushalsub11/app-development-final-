@@ -3,14 +3,14 @@
 @using JournalApp.Services
 
 @* [VIVA INFO]: This page handles User Input Collection and calls the Auth Service. *@
-<PageTitle>Login - Journal App</PageTitle>
+<PageTitle>Login - Journal Atelier</PageTitle>
 
 <div class="login-wrapper">
     <MudContainer MaxWidth="MaxWidth.Small" Class="pa-0">
         <MudCard Elevation="8" Class="rounded-lg login-card-premium overflow-hidden">
             <div class="login-banner">
                 <MudIcon Icon="@Icons.Material.Filled.MenuBook" Size="Size.Large" Color="Color.Inherit" Class="mb-2" />
-                <MudText Typo="Typo.h5" Color="Color.Inherit"><b>Journal App</b></MudText>
+                <MudText Typo="Typo.h5" Color="Color.Inherit"><b>Journal Atelier</b></MudText>
             </div>
             
             <MudCardContent Class="pa-8">
@@ -62,18 +62,25 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 2rem 1rem;
     }
     .login-card-premium {
-        max-width: 450px;
+        max-width: 480px;
+        border-radius: 24px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg);
+        background: var(--surface-1);
     }
     .login-banner {
-        background: linear-gradient(135deg, var(--mud-palette-primary) 0%, var(--mud-palette-secondary) 100%);
-        color: white;
-        padding: 40px;
+        background: linear-gradient(135deg, rgba(47, 107, 95, 0.18) 0%, rgba(201, 106, 75, 0.18) 100%);
+        color: var(--text-primary);
+        padding: 36px;
         text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        border-bottom: 1px solid var(--border-color);
     }
 </style>
+
