@@ -1,0 +1,32 @@
+@using JournalApp.Services
+@inject AuthenticationStateService AuthState
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<div class="top-nav">
+    <MudNavLink href="dashboard" Match="NavLinkMatch.All" Class="nav-chip" Icon="@Icons.Material.Filled.Explore">Dashboard</MudNavLink>
+    <MudNavLink href="entries" Match="NavLinkMatch.Prefix" Class="nav-chip" Icon="@Icons.Material.Filled.ViewTimeline">Journal</MudNavLink>
+    <MudNavLink href="calendar" Match="NavLinkMatch.Prefix" Class="nav-chip" Icon="@Icons.Material.Filled.CalendarToday">Calendar</MudNavLink>
+    <MudNavLink href="analytics" Match="NavLinkMatch.Prefix" Class="nav-chip" Icon="@Icons.Material.Filled.BlurOn">Insights</MudNavLink>
+    <MudNavLink href="settings" Match="NavLinkMatch.Prefix" Class="nav-chip" Icon="@Icons.Material.Filled.Tune">Settings</MudNavLink>
+</div>
+
+<style>
+    .top-nav { display: flex; align-items: center; gap: 0.25rem; }
+    .nav-chip {
+        border-radius: 12px !important;
+        padding: 0.35rem 0.75rem !important;
+        font-weight: 700 !important;
+        text-transform: none !important;
+        color: #cdd6f4 !important;
+        transition: all 0.2s ease !important;
+    }
+    .nav-chip:hover { background: rgba(255, 255, 255, 0.08) !important; color: #f7f8ff !important; transform: translateY(-1px); }
+    .nav-chip.active { background: linear-gradient(120deg, #f6c344, #f0618f) !important; color: #0b0f1c !important; box-shadow: 0 10px 28px rgba(240, 97, 143, 0.35); }
+</style>
+
+@code {
+    protected override void OnInitialized()
+    {
+    }
+}

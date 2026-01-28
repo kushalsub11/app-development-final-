@@ -1,0 +1,328 @@
+@page "/dashboard"
+@using JournalApp.Services
+@using JournalApp.Data
+@using JournalApp.Models
+
+@* [VIVA INFO]: The Dashboard is the central 'Landing Hub' after login. 
+   It provides a high-level overview (Recent Entries + Quick Stats).
+*@
+<PageTitle>Dashboard - Journal App</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="neo-shell">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-6 rounded-lg shadow-sm" ShowCloseIcon="true" CloseIconClicked="(() => errorMessage = string.Empty)">
+            @errorMessage
+        </MudAlert>
+    }
+
+    <section class="hero-bar">
+        <div>
+            <MudText Typo="Typo.h3" Class="hero-title">Hey @AuthState.GetCurrentUsername(), this is your neon journal lane.</MudText>
+            <MudText Typo="Typo.subtitle1" Class="hero-sub">Keep moving—everything updates live as you write.</MudText>
+        </div>
+        <div class="hero-actions">
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.EditNote" Size="Size.Large" OnClick='(() => Navigation.NavigateTo("/create-entry"))' Class="pill-btn">
+                New Entry
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Insights" OnClick='(() => Navigation.NavigateTo("/analytics"))' Class="pill-btn alt">
+                Analytics
+            </MudButton>
+        </div>
+    </section>
+
+    @if (isLoading)
+    {
+        <div class="loader-wrap">
+            <MudProgressCircular Color="Color.Secondary" Indeterminate="true" Size="Size.Large" StrokeWidth="5" />
+        </div>
+    }
+    else
+    {
+        <section class="ribbon-grid">
+            <div class="ribbon-chip">
+                <div class="ribbon-meta">
+                    <span class="ribbon-label">Total Entries</span>
+                    <span class="ribbon-value">@(analytics?.TotalEntries ?? 0)</span>
+                </div>
+                <MudIcon Icon="@Icons.Material.Filled.HistoryEdu" Color="Color.Secondary" />
+            </div>
+            <div class="ribbon-chip">
+                <div class="ribbon-meta">
+                    <span class="ribbon-label">Current Streak</span>
+                    <span class="ribbon-value">@(analytics?.CurrentStreak ?? 0)</span>
+                </div>
+                <MudIcon Icon="@Icons.Material.Filled.AutoGraph" Color="Color.Secondary" />
+            </div>
+            <div class="ribbon-chip">
+                <div class="ribbon-meta">
+                    <span class="ribbon-label">Longest Streak</span>
+                    <span class="ribbon-value">@(analytics?.LongestStreak ?? 0)</span>
+                </div>
+                <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Color="Color.Secondary" />
+            </div>
+            <div class="ribbon-chip">
+                <div class="ribbon-meta">
+                    <span class="ribbon-label">Days Away</span>
+                    <span class="ribbon-value">@(analytics?.MissedDays ?? 0)</span>
+                </div>
+                <MudIcon Icon="@Icons.Material.Filled.Nightlight" Color="Color.Secondary" />
+            </div>
+        </section>
+
+        <MudGrid Class="content-grid">
+            <MudItem xs="12" lg="7">
+                <div class="section-header">
+                    <div>
+                        <MudText Typo="Typo.h5" Class="section-title">Live timeline</MudText>
+                        <MudText Typo="Typo.body2" Class="muted">Recent reflections stacked on a vertical rail.</MudText>
+                    </div>
+                    <MudButton OnClick='(() => Navigation.NavigateTo("/entries"))' Variant="Variant.Text" Color="Color.Secondary" EndIcon="@Icons.Material.Filled.ArrowForward" Class="ghost-btn">View all</MudButton>
+                </div>
+
+                @if (recentEntries == null || !recentEntries.Any())
+                {
+                    <div class="empty-rail">
+                        <MudIcon Icon="@Icons.Material.Filled.HistoryEdu" Color="Color.Secondary" Size="Size.Large" />
+                        <MudText Typo="Typo.h6" Class="fw-bold">No entries yet</MudText>
+                        <MudText Typo="Typo.body2" Class="muted">Write your first thought and the rail will light up.</MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick='(() => Navigation.NavigateTo("/create-entry"))' Class="pill-btn">Start journaling</MudButton>
+                    </div>
+                }
+                else
+                {
+                    <div class="timeline">
+                        @foreach (var entry in recentEntries)
+                        {
+                            <div class="rail-item" @onclick="(() => HandleEntryClick(entry))">
+                                <div class="rail-dot @entry.PrimaryMoodCategory.ToString().ToLower()">
+                                    <span>@GetMoodEmoji(entry.PrimaryMood)</span>
+                                </div>
+                                <div class="rail-body">
+                                    <div class="rail-meta">
+                                        <MudText Typo="Typo.subtitle1" Class="fw-bold rail-title">@entry.Title</MudText>
+                                        <MudText Typo="Typo.caption" Class="muted">@entry.EntryDate.ToString("MMM dd, yyyy")</MudText>
+                                    </div>
+                                    @if (string.IsNullOrEmpty(entry.Pin))
+                                    {
+                                        <MudText Typo="Typo.body2" Class="muted clamp-3">@entry.Content</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudText Typo="Typo.body2" Class="locked">Encrypted entry. Tap to unlock.</MudText>
+                                    }
+                                    <div class="rail-tags">
+                                        @if (!string.IsNullOrEmpty(entry.Tags))
+                                        {
+                                            @foreach (var tag in entry.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries).Take(3))
+                                            {
+                                                <span class="chip">#@tag.Trim()</span>
+                                            }
+                                        }
+                                        <MudSpacer />
+                                        <MudIcon Icon="@(string.IsNullOrEmpty(entry.Pin) ? Icons.Material.Filled.ChevronRight : Icons.Material.Filled.LockOpen)" Color="Color.Secondary" Size="Size.Small" />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </MudItem>
+
+            <MudItem xs="12" lg="5">
+                <div class="section-header">
+                    <div>
+                        <MudText Typo="Typo.h5" Class="section-title">Insights desk</MudText>
+                        <MudText Typo="Typo.body2" Class="muted">Mood, tags, and a progress ring in one stack.</MudText>
+                    </div>
+                </div>
+
+                <div class="insight-stack">
+                    <div class="insight-panel glassy">
+                        <div class="panel-head">
+                            <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Color="Color.Secondary" />
+                            <MudText Typo="Typo.subtitle1" Class="fw-bold">Mood pulse</MudText>
+                        </div>
+                        <MudText Typo="Typo.body2" Class="muted">Most frequent vibe: <b>@analytics?.MostFrequentMood?.ToLower()</b>. Keep the pulse steady.</MudText>
+                        <MudButton OnClick='(() => Navigation.NavigateTo("/analytics"))' Variant="Variant.Filled" Color="Color.Secondary" FullWidth="true" Class="pill-btn block">Open analytics</MudButton>
+                    </div>
+
+                    <div class="insight-panel tags">
+                        <div class="panel-head">
+                            <MudIcon Icon="@Icons.Material.Filled.Tag" Color="Color.Secondary" />
+                            <MudText Typo="Typo.subtitle1" Class="fw-bold">Tag heat</MudText>
+                        </div>
+                        @if (analytics?.TagUsageCount != null && analytics.TagUsageCount.Any())
+                        {
+                            <div class="tag-cloud">
+                                @foreach (var tag in analytics.TagUsageCount.Take(10))
+                                {
+                                    <span class="chip ghost">@tag.Key</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.body2" Class="muted">No tags yet—add some to spark this cloud.</MudText>
+                        }
+                    </div>
+
+                    <div class="insight-panel progress">
+                        <div class="panel-head">
+                            <MudIcon Icon="@Icons.Material.Filled.Flag" Color="Color.Secondary" />
+                            <MudText Typo="Typo.subtitle1" Class="fw-bold">Next milestone</MudText>
+                        </div>
+                        <div class="progress-wrap">
+                            <MudProgressCircular Color="Color.Secondary" Value="@(Math.Min(100, (analytics?.TotalEntries % 20 ?? 0) * 5))" Size="Size.Large" StrokeWidth="6" />
+                            <div class="progress-count">
+                                <MudText Typo="Typo.h6" Color="Color.Secondary"><b>@(analytics?.TotalEntries % 20 ?? 0)</b></MudText>
+                                <MudText Typo="Typo.caption" Class="muted">/ 20 entries</MudText>
+                            </div>
+                        </div>
+                        <MudText Typo="Typo.body2" Class="muted">@(20 - (analytics?.TotalEntries % 20 ?? 0)) more until the next badge.</MudText>
+                    </div>
+                </div>
+            </MudItem>
+        </MudGrid>
+    }
+</MudContainer>
+
+<style>
+    :host { font-family: "Space Grotesk", "Segoe UI", sans-serif; }
+
+    .neo-shell {
+        padding: 2rem 0 3rem;
+        color: #e8ecf3;
+    }
+
+    .hero-bar {
+        background: linear-gradient(120deg, #0f172a 0%, #1e1133 55%, #111827 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 22px;
+        padding: 1.75rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-bar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.25), transparent 30%),
+                    radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.2), transparent 35%);
+        pointer-events: none;
+    }
+
+    .hero-title { color: #f7f7ff; letter-spacing: -0.02em; font-weight: 800; }
+    .hero-sub { color: rgba(232, 236, 243, 0.7); }
+
+    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .pill-btn { border-radius: 999px; padding: 0.65rem 1.4rem; font-weight: 700; text-transform: none; }
+    .pill-btn.alt { border-color: rgba(255,255,255,0.2); color: #f7f7ff; }
+
+    .loader-wrap { display: flex; justify-content: center; align-items: center; height: 60vh; }
+
+    .ribbon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+        margin: 1.75rem 0 2.25rem;
+    }
+
+    .ribbon-chip {
+        background: linear-gradient(90deg, rgba(124, 58, 237, 0.16), rgba(16, 185, 129, 0.16));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 1rem 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #f8fafc;
+        backdrop-filter: blur(10px);
+    }
+    .ribbon-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.7; }
+    .ribbon-value { font-size: 1.8rem; font-weight: 800; }
+
+    .content-grid { row-gap: 2rem; }
+    .section-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
+    .section-title { letter-spacing: 0.02em; font-weight: 800; }
+    .muted { color: rgba(232, 236, 243, 0.65); }
+    .ghost-btn { color: #a5b4fc; text-transform: none; font-weight: 700; }
+
+    .empty-rail {
+        border: 1px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 18px;
+        padding: 2rem;
+        display: grid;
+        gap: 0.6rem;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .timeline { border-left: 2px dashed rgba(255, 255, 255, 0.12); padding-left: 1.5rem; display: grid; gap: 1rem; }
+    .rail-item { display: grid; grid-template-columns: auto 1fr; gap: 1rem; cursor: pointer; position: relative; }
+    .rail-item:hover .rail-body { border-color: rgba(165, 180, 252, 0.4); }
+    .rail-dot { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 1.6rem; color: #0b0f1a; font-weight: 800; }
+    .rail-dot.positive { background: #10b981; }
+    .rail-dot.neutral { background: #60a5fa; }
+    .rail-dot.negative { background: #f87171; }
+    .rail-dot.default { background: #a78bfa; }
+
+    .rail-body {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 1rem 1.25rem;
+        backdrop-filter: blur(6px);
+        transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .rail-body:hover { transform: translateX(4px); }
+    .rail-meta { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.35rem; }
+    .rail-title { color: #f8fafc; letter-spacing: 0.01em; }
+    .clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .locked { color: #fbbf24; font-style: italic; }
+    .rail-tags { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; }
+    .chip { padding: 0.35rem 0.7rem; border-radius: 999px; background: rgba(165, 180, 252, 0.18); color: #e0e7ff; font-weight: 700; font-size: 0.8rem; }
+    .chip.ghost { background: rgba(255, 255, 255, 0.06); color: #cbd5f5; }
+
+    .insight-stack { display: grid; gap: 1rem; }
+    .insight-panel {
+        border-radius: 18px;
+        padding: 1.25rem 1.4rem;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(12, 16, 26, 0.85);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+    .glassy { background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(16, 185, 129, 0.08)); }
+    .tags { background: rgba(255, 255, 255, 0.03); }
+    .progress { background: linear-gradient(160deg, rgba(17, 24, 39, 0.9), rgba(23, 37, 84, 0.7)); }
+    .panel-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .progress-wrap { position: relative; width: 120px; margin: 0.6rem auto 0.4rem; }
+    .progress-count { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+
+    @@media (max-width: 900px) {
+        .hero-bar { flex-direction: column; align-items: flex-start; }
+        .hero-actions { width: 100%; }
+        .ribbon-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+        .rail-item { grid-template-columns: auto 1fr; }
+    }
+</style>
+
+@code {
+    private string GetMoodEmoji(string mood)
+    {
+        return mood?.ToLower() switch
+        {
+            "happy" or "positive" or "joyful" or "excited" or "thrilled" => "😊",
+            "neutral" or "calm" or "tired" or "okay" or "peaceful" => "😐",
+            "sad" or "negative" or "angry" or "stressed" or "frustrated" => "😔",
+            _ => "📝"
+        };
+    }
+}

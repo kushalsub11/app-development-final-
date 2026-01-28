@@ -1,0 +1,342 @@
+@page "/analytics"
+@using JournalApp.Services
+@using JournalApp.Data
+
+@* [VIVA INFO]: This page demonstrates 'Data Visualization'. 
+   It fetches aggregated data from the AnalyticsService and displays it using MudBlazor components.
+*@
+<PageTitle>Analytics - Journal App</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="insight-shell">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="mb-6 rounded-lg shadow-sm" ShowCloseIcon="true" CloseIconClicked="(() => errorMessage = string.Empty)">
+            @errorMessage
+        </MudAlert>
+    }
+
+    <header class="insight-header">
+        <div>
+            <MudText Typo="Typo.h4" Class="heading">Insights Report</MudText>
+            <MudText Typo="Typo.body2" Class="lede">A concise analytical readout for your selected window.</MudText>
+        </div>
+        <div class="filter-bar">
+            <MudDateRangePicker @bind-DateRange="_dateRange" Label="Date span" Variant="Variant.Outlined" Class="range-input" MaxDate="@DateTime.Today" Editable="true" />
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="UpdateAnalytics" Class="ghost-btn">Update</MudButton>
+        </div>
+    </header>
+
+    @if (isLoading)
+    {
+        <div class="loading-block">
+            <MudProgressCircular Color="Color.Secondary" Indeterminate="true" Size="Size.Large" />
+        </div>
+    }
+    else if (analytics != null)
+    {
+        <!-- Inline summary strip replaces cards -->
+        <section class="summary-strip" aria-label="Key metrics">
+            <div class="summary-item">
+                <span class="summary-label">Total sparks</span>
+                <span class="summary-value">@analytics.TotalEntries</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Active streak</span>
+                <span class="summary-value">@analytics.CurrentStreak</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Longest streak</span>
+                <span class="summary-value">@analytics.LongestStreak</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Avg. words</span>
+                <span class="summary-value">@((int)analytics.AverageWordCount)</span>
+            </div>
+        </section>
+
+        <div class="grid-two">
+            <section class="panel" aria-label="Mood distribution">
+                <div class="panel-head">
+                    <div>
+                        <MudText Typo="Typo.h6" Class="heading">Mood distribution</MudText>
+                        <MudText Typo="Typo.caption" Class="muted">Share of positive, neutral, and negative entries.</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.Insights" Color="Color.Secondary" />
+                </div>
+
+                <div class="mood-list">
+                    <div class="mood-row">
+                        <div class="mood-meta">
+                            <MudIcon Icon="@Icons.Material.Filled.SentimentSatisfied" Color="Color.Success" />
+                            <span>Positive</span>
+                        </div>
+                        <div class="meter">
+                            <div class="meter-fill success" style="width:@analytics.PositiveMoodPercentage%"></div>
+                        </div>
+                        <span class="mood-value">@analytics.PositiveMoodPercentage%</span>
+                    </div>
+
+                    <div class="mood-row">
+                        <div class="mood-meta">
+                            <MudIcon Icon="@Icons.Material.Filled.SentimentNeutral" Color="Color.Info" />
+                            <span>Neutral</span>
+                        </div>
+                        <div class="meter">
+                            <div class="meter-fill info" style="width:@analytics.NeutralMoodPercentage%"></div>
+                        </div>
+                        <span class="mood-value">@analytics.NeutralMoodPercentage%</span>
+                    </div>
+
+                    <div class="mood-row">
+                        <div class="mood-meta">
+                            <MudIcon Icon="@Icons.Material.Filled.SentimentDissatisfied" Color="Color.Error" />
+                            <span>Negative</span>
+                        </div>
+                        <div class="meter">
+                            <div class="meter-fill danger" style="width:@analytics.NegativeMoodPercentage%"></div>
+                        </div>
+                        <span class="mood-value">@analytics.NegativeMoodPercentage%</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel" aria-label="Word count trend">
+                <div class="panel-head">
+                    <div>
+                        <MudText Typo="Typo.h6" Class="heading">Word count trend</MudText>
+                        <MudText Typo="Typo.caption" Class="muted">Latest seven writing sessions.</MudText>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.Timeline" Color="Color.Secondary" />
+                </div>
+
+                @if (analytics.DailyWordCounts != null && analytics.DailyWordCounts.Any())
+                {
+                    <div class="trend-table" role="table">
+                        <div class="trend-row header" role="row">
+                            <span role="columnheader">Date</span>
+                            <span role="columnheader">Words</span>
+                            <span role="columnheader">Scale</span>
+                        </div>
+                        @foreach (var daily in analytics.DailyWordCounts.OrderByDescending(d => d.Key).Take(7))
+                        {
+                            <div class="trend-row" role="row">
+                                <span class="mono" role="cell">@daily.Key.ToString("MMM dd, yyyy")</span>
+                                <span role="cell">@daily.Value</span>
+                                <div class="bar" role="cell">
+                                    <span class="bar-fill" style="width:@Math.Min(100, (daily.Value / 500.0) * 100)%"></span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-note">No writing data for this range.</div>
+                }
+            </section>
+        </div>
+
+        <section class="panel" aria-label="Tag frequency">
+            <div class="panel-head">
+                <div>
+                    <MudText Typo="Typo.h6" Class="heading">Tag frequency</MudText>
+                    <MudText Typo="Typo.caption" Class="muted">Weighted list of your most used labels.</MudText>
+                </div>
+                <MudIcon Icon="@Icons.Material.Filled.Style" Color="Color.Secondary" />
+            </div>
+
+            @if (analytics.TagUsageCount.Any())
+            {
+                <div class="tag-grid">
+                    @foreach (var tag in analytics.TagUsageCount.Take(20))
+                    {
+                        var percentage = analytics.TagPercentages.ContainsKey(tag.Key) ? analytics.TagPercentages[tag.Key] : 0;
+                        <MudTooltip Text="@($"{tag.Value} mentions • {percentage}% of total tags")">
+                            <div class="tag-tile @(tag.Value > 10 ? "major" : (tag.Value > 5 ? "medium" : "minor"))">
+                                <span class="tag-name">#@tag.Key</span>
+                                <span class="tag-meta">@tag.Value</span>
+                            </div>
+                        </MudTooltip>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-note">No tags captured in this period. Tag entries to see frequency here.</div>
+            }
+        </section>
+    }
+</MudContainer>
+
+<style>
+    .fw-bold { font-weight: 800 !important; }
+    .opacity-75 { opacity: 0.75; }
+    .uppercase-tracking { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem; }
+    
+    .primary-gradient-text {
+        background: linear-gradient(135deg, var(--mud-palette-primary) 0%, var(--mud-palette-secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .metric-card {
+        padding: 1.5rem;
+        border-radius: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        color: white;
+        min-height: 140px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .metric-card:hover { 
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    }
+
+    .peace-card { background: linear-gradient(135deg, #4B6E5B 0%, #7A9D54 100%); }
+    .serenity-card { background: linear-gradient(135deg, #8EACCD 0%, #6895D2 100%); }
+    .success-fade-card { background: linear-gradient(135deg, #7A9D54 0%, #A4BC92 100%); }
+    .info-fade-card { background: linear-gradient(135deg, #9EC8B9 0%, #5C8374 100%); }
+
+    .metric-content { position: relative; z-index: 2; }
+    
+    .metric-icon {
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        /* Editorial analytics tone */
+        .heading { font-weight: 800; letter-spacing: -0.01em; }
+        .lede { color: var(--text-secondary); }
+
+        .insight-shell { padding: 2rem 0 3rem; }
+
+        .insight-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-bar { display: flex; align-items: center; gap: 0.75rem; }
+        .range-input { min-width: 240px; }
+        .ghost-btn { border-radius: var(--radius-md); text-transform: none; font-weight: 700; }
+
+        .loading-block { display: grid; place-items: center; height: 55vh; }
+
+        .summary-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.35rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--surface-1);
+            margin-bottom: 1.5rem;
+        }
+        .summary-item { display: grid; gap: 0.1rem; padding: 0.4rem 0.6rem; border-right: 1px solid var(--border-color); }
+        .summary-item:last-child { border-right: none; }
+        .summary-label { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72rem; }
+        .summary-value { font-size: 1.6rem; font-weight: 800; color: var(--text-primary); }
+
+        .grid-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+
+        .panel {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1.3rem;
+            background: var(--surface-1);
+            box-shadow: var(--shadow-sm);
+        }
+        .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
+        .muted { color: var(--text-muted); }
+
+        /* Mood rows use meters instead of progress bars */
+        .mood-list { display: grid; gap: 0.75rem; }
+        .mood-row { display: grid; grid-template-columns: 1fr 3fr auto; align-items: center; gap: 0.75rem; }
+        .mood-meta { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; }
+        .meter { position: relative; height: 10px; background: var(--surface-2); border-radius: 999px; overflow: hidden; border: 1px solid var(--border-color); }
+        .meter-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 999px; }
+        .meter-fill.success { background: linear-gradient(90deg, #22c55e, #b1f5c8); }
+        .meter-fill.info { background: linear-gradient(90deg, #60a5fa, #c8e3ff); }
+        .meter-fill.danger { background: linear-gradient(90deg, #ef4444, #ffb3b3); }
+        .mood-value { font-weight: 700; color: var(--text-primary); }
+
+        /* Trend table styling */
+        .trend-table { display: grid; gap: 0.25rem; }
+        .trend-row { display: grid; grid-template-columns: 1.6fr 0.7fr 1.7fr; align-items: center; padding: 0.45rem 0.35rem; border-bottom: 1px solid var(--border-color); }
+        .trend-row.header { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .trend-row:last-child { border-bottom: none; }
+        .mono { font-family: "IBM Plex Mono", "IBM Plex Sans", monospace; }
+        .bar { background: var(--surface-2); height: 8px; border-radius: 999px; position: relative; overflow: hidden; border: 1px solid var(--border-color); }
+        .bar-fill { position: absolute; inset: 0; background: linear-gradient(90deg, var(--primary-color), rgba(127, 90, 240, 0.6)); border-radius: 999px; }
+
+        /* Tag grid */
+        .tag-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6rem; }
+        .tag-tile {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.65rem 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface-2);
+            font-weight: 700;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+        .tag-tile:hover { transform: translateY(-1px); border-color: var(--border-light); }
+        .tag-name { color: var(--text-primary); }
+        .tag-meta { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+        .tag-tile.major { background: linear-gradient(90deg, rgba(246,195,68,0.14), rgba(127,90,240,0.08)); }
+        .tag-tile.medium { background: rgba(127, 90, 240, 0.08); }
+        .tag-tile.minor { background: var(--surface-2); }
+
+        .empty-note {
+            border: 1px dashed var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        @@media (max-width: 768px) {
+            .summary-item { border-right: none; border-bottom: 1px solid var(--border-color); }
+            .summary-strip { gap: 0.65rem; }
+            .filter-bar { flex-direction: column; align-items: flex-start; }
+        }
+    .tag-count { font-size: 0.75rem; opacity: 0.7; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 8px; }
+
+    .glass {
+        backdrop-filter: blur(10px);
+        background: rgba(var(--mud-palette-surface-rgb), 0.8) !important;
+        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05) !important;
+    }
+
+    .glass-inner {
+        background: rgba(var(--mud-palette-surface-rgb), 0.5) !important;
+        border: 1px solid rgba(var(--mud-palette-divider-rgb), 0.05) !important;
+    }
+
+    .rounded-xxl { border-radius: 2rem; }
+    .shadow-primary { box-shadow: 0 10px 15px -3px rgba(var(--mud-palette-primary-rgb), 0.3); }
+
+    @@keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    @@keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fade-in-up 0.6s ease-out forwards; }
+    .animate-fade-in-up { animation: fade-in-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+</style>
+

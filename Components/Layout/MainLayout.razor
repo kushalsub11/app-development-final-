@@ -1,0 +1,169 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject AuthenticationStateService AuthState
+@inject NavigationManager Navigation
+@inject SettingsService SettingsService
+@inject IJSRuntime JSRuntime
+
+@* [VIVA INFO]: MainLayout is the 'Shell' of the application. 
+   It contains the Sidebar, Header, and Theme configuration that persist across all pages.
+*@
+
+<MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" Theme="_theme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="0" Class="new-appbar">
+        <div class="brand-mark" @onclick='() => Navigation.NavigateTo("/dashboard")'>
+            <span class="brand-glyph">✦</span>
+            <div>
+                <MudText Typo="Typo.subtitle1" Class="brand-title">Journal Studio</MudText>
+                <MudText Typo="Typo.caption" Class="brand-sub">Flow-first workspace</MudText>
+            </div>
+        </div>
+
+        <div class="nav-rail">
+            <NavMenu />
+        </div>
+
+        <MudSpacer />
+        <div class="command-rail">
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" Class="chip-btn" OnClick='(() => Navigation.NavigateTo("/create-entry"))'>New entry</MudButton>
+            <MudIconButton Icon="@Icons.Material.Filled.DarkMode" Color="Color.Inherit" OnClick="ToggleTheme" Class="ghost-icon" />
+            @if (AuthState.IsAuthenticated)
+            {
+                <div class="user-inline">
+                    <MudAvatar Color="Color.Secondary" Size="Size.Medium" Class="shadow-sm">@AuthState.GetCurrentUsername()?[0].ToString().ToUpper()</MudAvatar>
+                    <div>
+                        <MudText Typo="Typo.caption" Class="muted">Signed in</MudText>
+                        <MudText Typo="Typo.body2" Class="fw-bold">@AuthState.GetCurrentUsername()</MudText>
+                    </div>
+                </div>
+            }
+        </div>
+    </MudAppBar>
+
+    <MudMainContent Class="shell">
+        <div class="page-frame">
+            @Body
+        </div>
+    </MudMainContent>
+</MudLayout>
+
+<style>
+    :host { font-family: "Sora", "Inter", system-ui, sans-serif; }
+
+    .new-appbar {
+        backdrop-filter: blur(18px) saturate(140%);
+        background: linear-gradient(90deg, rgba(16, 18, 32, 0.92), rgba(26, 17, 46, 0.88));
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.9rem 1.5rem;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 1rem;
+        color: #e8ecf5;
+    }
+
+    .brand-mark { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+    .brand-glyph {
+        width: 38px; height: 38px; border-radius: 14px;
+        display: grid; place-items: center;
+        background: linear-gradient(135deg, #f6c344, #f0618f);
+        color: #0b0f1c; font-weight: 800;
+        box-shadow: 0 10px 30px rgba(240, 97, 143, 0.35);
+    }
+    .brand-title { color: #f7f8ff; letter-spacing: -0.01em; font-weight: 800; }
+    .brand-sub { color: rgba(232, 236, 245, 0.7); }
+
+    .nav-rail { display: flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.5rem; border-radius: 16px; background: rgba(255, 255, 255, 0.04); }
+
+    .command-rail { display: flex; align-items: center; gap: 0.75rem; }
+    .chip-btn { border-radius: 999px; text-transform: none; font-weight: 700; }
+    .ghost-icon { background: rgba(255, 255, 255, 0.04); border-radius: 12px; }
+
+    .user-inline { display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0.75rem; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .muted { color: rgba(232, 236, 243, 0.7); }
+
+    .shell { background: radial-gradient(circle at 10% 10%, rgba(111, 87, 217, 0.12), transparent 30%), radial-gradient(circle at 90% 20%, rgba(248, 180, 72, 0.12), transparent 32%), #0c0f1a; min-height: 100vh; }
+    .page-frame { max-width: 1440px; margin: 0 auto; padding: 2.5rem 2rem 3rem; }
+
+    .fw-bold { font-weight: 700 !important; }
+    .fw-extra-bold { font-weight: 900 !important; }
+
+    .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+    @@keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    @@media (max-width: 900px) {
+        .new-appbar { grid-template-columns: 1fr; align-items: flex-start; }
+        .nav-rail { flex-wrap: wrap; }
+        .command-rail { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+        .page-frame { padding: 1.5rem; }
+    }
+</style>
+
+@code {
+    bool _drawerOpen = true;
+    private bool _isDarkMode = true;
+    private MudThemeProvider _mudThemeProvider = null!;
+    
+    private MudTheme _theme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#4D96FF",
+            Secondary = "#FF8A8A",
+            Tertiary = "#00EA9C",
+            Background = "#F8FAFC",
+            Surface = "#FFFFFF",
+            AppbarBackground = "#FFFFFF",
+            DrawerBackground = "#FFFFFF",
+            DrawerText = "#1A1F36",
+            TextPrimary = "#1A1F36",
+            TextSecondary = "#64748B",
+            ActionDefault = "#475569",
+            Divider = "rgba(0,0,0, 0.08)"
+        },
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#4D96FF",       // Vibrant Blue
+            Secondary = "#FF8A8A",     // Soft Pink
+            Tertiary = "#00EA9C",      // Emerald
+            Surface = "#1A1F36",       // Navy Surface
+            Background = "#0A0D18",    // Deep Navy Background
+            DrawerBackground = "#12182B",
+            AppbarBackground = "rgba(10, 13, 24, 0.8)",
+            ActionDefault = "#94A3B8",
+            ActionDisabled = "rgba(148, 163, 184, 0.3)",
+            TextPrimary = "#F8FAFC",   
+            TextSecondary = "#A3ACC2", 
+            Divider = "rgba(255, 255, 255, 0.08)",
+            TableLines = "rgba(255, 255, 255, 0.05)"
+        }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await SettingsService.GetSettingsAsync();
+        _isDarkMode = settings.Theme == "Dark";
+        SettingsService.ThemeChanged += HandleThemeChanged;
+    }
+
+    private void HandleThemeChanged(string theme)
+    {
+        _isDarkMode = theme == "Dark";
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        SettingsService.ThemeChanged -= HandleThemeChanged;
+    }
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
